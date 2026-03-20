@@ -1,6 +1,7 @@
 pub mod client;
 pub mod details;
 pub mod error;
+pub mod mcp;
 pub mod scraper;
 pub mod types;
 
