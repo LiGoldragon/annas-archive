@@ -317,9 +317,8 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             domains: vec![
-                "annas-archive.org".into(),
-                "annas-archive.se".into(),
-                "annas-archive.li".into(),
+                "annas-archive.gd".into(),
+                "annas-archive.gs".into(),
             ],
             user_agent: format!("annas-archive/{}", env!("CARGO_PKG_VERSION")),
             api_key: None,
