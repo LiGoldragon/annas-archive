@@ -2,10 +2,9 @@
 
 ## Overview
 
-Rust client library for [Anna's Archive](https://annas-archive.gd/) — a
-meta-index aggregating LibGen, Sci-Hub, Z-Library, Internet Archive, and
-other shadow libraries. This is a leaf crate in the Mentci ecosystem with
-no dependencies on ecosystem crates.
+Rust client library for Anna's Archive — a meta-index aggregating LibGen,
+Sci-Hub, Z-Library, Internet Archive, and other shadow libraries. Leaf
+crate in the Mentci ecosystem, no dependencies on ecosystem crates.
 
 ## API surface
 
@@ -15,30 +14,10 @@ no dependencies on ecosystem crates.
 | `Client::details(md5)` | Yes | JSON API for rich item metadata |
 | `Client::download_url(DownloadRequest)` | Yes | Fast download URL resolution |
 
-Search works without authentication. Details and downloads require an
-Anna's Archive API key (see below).
-
-## Getting an API key
-
-Anna's Archive grants API access to donors:
-
-1. Go to [annas-archive.gd/donate](https://annas-archive.gd/donate)
-2. Donate via cryptocurrency, Amazon gift card, Cash App, or Alipay
-   (conventional payment not available due to legal status)
-3. After donation, find your **secret key** in Account Settings
-4. Pass the key via `Client::with_api_key("your-key")`
-
-Without a key, only `search()` is available. `details()` and
-`download_url()` will return `Error::KeyRequired`.
-
 ## Domain failover
 
-Anna's Archive domains change frequently due to legal pressure. The
-client tries each configured domain in order. Current defaults:
+Domains change frequently due to legal pressure. Current defaults:
 `annas-archive.gd`, `annas-archive.gs`. Override via `Config::domains`.
-
-If all defaults stop working, check the project's wiki or social channels
-for current mirrors and pass them via `Config`.
 
 ## Testing
 
