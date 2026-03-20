@@ -5,7 +5,7 @@ use reqwest::cookie::Jar;
 
 use crate::error::Error;
 use crate::types::{
-    Config, DownloadInfo, DownloadRequest, ItemDetails, SearchOptions,
+    Config, DownloadInfo, DownloadRequest, ItemDetails, Md5, SearchOptions,
     SearchResponse,
 };
 
@@ -82,7 +82,7 @@ impl Client {
     /// Requires an API key.
     pub async fn details(
         &self,
-        md5: &str,
+        md5: &Md5,
     ) -> Result<ItemDetails, Error> {
         self.ensure_authenticated().await?;
 

@@ -7,7 +7,7 @@ use rmcp::{
     schemars, tool, tool_handler, tool_router,
 };
 
-use crate::types::{DownloadRequest, SearchOptions};
+use crate::types::{DownloadRequest, Md5, SearchOptions};
 use crate::Client;
 
 // ── Parameter types ──────────────────────────────────────────────
@@ -106,7 +106,8 @@ impl Server {
         &self,
         Parameters(params): Parameters<DetailsParams>,
     ) -> String {
-        match self.client.details(&params.md5).await {
+        let md5 = Md5::from(params.md5.as_str());
+        match self.client.details(&md5).await {
             Ok(details) => {
                 serde_json::to_string_pretty(&details).unwrap_or_else(
                     |e| format!("{{\"error\": \"serialization: {e}\"}}"),
@@ -124,7 +125,7 @@ impl Server {
         Parameters(params): Parameters<DownloadParams>,
     ) -> String {
         let request = DownloadRequest {
-            md5: params.md5,
+            md5: Md5::from(params.md5.as_str()),
             path_index: params.path_index,
             domain_index: params.domain_index,
         };

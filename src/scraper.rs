@@ -1,7 +1,7 @@
 use scraper::{Html, Node, Selector};
 
 use crate::error::Error;
-use crate::types::{FileFormat, Metadata, SearchResponse, SearchResult};
+use crate::types::{FileFormat, Md5, Metadata, SearchResponse, SearchResult};
 
 // ── CSS selectors ────────────────────────────────────────────────
 // Centralised here so they are easy to update when Anna's Archive
@@ -35,7 +35,7 @@ impl SearchResponse {
                 .next()
                 .and_then(|a| a.value().attr("href"))
                 .and_then(|href| href.strip_prefix("/md5/"))
-                .map(|s| s.to_string());
+                .map(Md5::from);
 
             let Some(md5) = md5 else { continue };
 

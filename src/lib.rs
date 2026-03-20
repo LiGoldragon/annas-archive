@@ -9,6 +9,6 @@ pub use client::Client;
 pub use error::Error;
 pub use types::{
     Config, ContentType, DownloadInfo, DownloadRequest, DownloadSource,
-    FileFormat, Identifiers, IpfsInfo, ItemDetails, Metadata, SearchOptions,
+    FileFormat, Identifiers, IpfsInfo, ItemDetails, Md5, Metadata, SearchOptions,
     SearchResponse, SearchResult,
 };

@@ -115,12 +115,78 @@ impl std::fmt::Display for ContentType {
     }
 }
 
+// ── Md5 ──────────────────────────────────────────────────────────
+
+/// An MD5 content hash identifying an item in Anna's Archive.
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct Md5([u8; 16]);
+
+impl Md5 {
+    /// Construct from raw bytes.
+    pub fn from_bytes(bytes: [u8; 16]) -> Self {
+        Self(bytes)
+    }
+
+    /// The raw 16-byte hash.
+    pub fn as_bytes(&self) -> &[u8; 16] {
+        &self.0
+    }
+
+    /// Hex string representation.
+    pub fn to_hex(&self) -> String {
+        self.0.iter().map(|b| format!("{b:02x}")).collect()
+    }
+}
+
+impl std::fmt::Debug for Md5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Md5({})", self.to_hex())
+    }
+}
+
+impl std::fmt::Display for Md5 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.to_hex())
+    }
+}
+
+impl From<&str> for Md5 {
+    fn from(s: &str) -> Self {
+        let mut bytes = [0u8; 16];
+        // Parse hex string — if malformed, store as zero-padded.
+        for (i, chunk) in s.as_bytes().chunks(2).take(16).enumerate() {
+            let hex = std::str::from_utf8(chunk).unwrap_or("00");
+            bytes[i] = u8::from_str_radix(hex, 16).unwrap_or(0);
+        }
+        Self(bytes)
+    }
+}
+
+impl From<String> for Md5 {
+    fn from(s: String) -> Self {
+        Self::from(s.as_str())
+    }
+}
+
+impl Serialize for Md5 {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(&self.to_hex())
+    }
+}
+
+impl<'de> Deserialize<'de> for Md5 {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        Ok(Self::from(s.as_str()))
+    }
+}
+
 // ── Search types ─────────────────────────────────────────────────
 
 /// A single search result from the HTML search page.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SearchResult {
-    pub md5: String,
+    pub md5: Md5,
     pub title: String,
     pub author: Option<String>,
     pub format: Option<FileFormat>,
@@ -170,13 +236,13 @@ pub struct Metadata {
 /// Request parameters for resolving a download URL.
 #[derive(Debug, Clone)]
 pub struct DownloadRequest {
-    pub md5: String,
+    pub md5: Md5,
     pub path_index: Option<u32>,
     pub domain_index: Option<u32>,
 }
 
 impl DownloadRequest {
-    pub fn new(md5: impl Into<String>) -> Self {
+    pub fn new(md5: impl Into<Md5>) -> Self {
         Self {
             md5: md5.into(),
             path_index: None,
@@ -257,7 +323,7 @@ pub struct DownloadSource {
 /// Full item details from the JSON API.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ItemDetails {
-    pub md5: String,
+    pub md5: Md5,
     pub title: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<String>,

@@ -1,6 +1,7 @@
 use crate::error::Error;
 use crate::types::{
     ContentType, DownloadSource, FileFormat, Identifiers, IpfsInfo, ItemDetails,
+    Md5,
 };
 
 impl ItemDetails {
@@ -8,7 +9,7 @@ impl ItemDetails {
     ///
     /// The response may be double-encoded (a JSON string containing JSON),
     /// so both forms are handled.
-    pub fn from_json(json_str: &str, md5: &str) -> Result<Self, Error> {
+    pub fn from_json(json_str: &str, md5: &Md5) -> Result<Self, Error> {
         let json_str = json_str.trim();
 
         // Handle double-encoded JSON.
@@ -86,7 +87,7 @@ impl ItemDetails {
         let torrent_paths = torrent_paths_from_json(additional);
 
         Ok(Self {
-            md5: md5.to_string(),
+            md5: md5.clone(),
             title,
             author,
             format,
@@ -352,14 +353,14 @@ mod tests {
         }"#;
 
         let details =
-            ItemDetails::from_json(json, "abc123").expect("should parse");
+            ItemDetails::from_json(json, &Md5::from("abc123")).expect("should parse");
         assert_eq!(details.title, "Test Book");
         assert_eq!(details.author.as_deref(), Some("Jane Doe"));
         assert_eq!(details.format, Some(FileFormat::Pdf));
         assert_eq!(details.size.as_deref(), Some("1.0MB"));
         assert_eq!(details.size_bytes, Some(1048576));
         assert_eq!(details.language.as_deref(), Some("en"));
-        assert_eq!(details.md5, "abc123");
+        assert_eq!(details.md5, Md5::from("abc123"));
     }
 
     #[test]
@@ -375,7 +376,7 @@ mod tests {
         }"#;
 
         let details =
-            ItemDetails::from_json(json, "def456").expect("should parse");
+            ItemDetails::from_json(json, &Md5::from("def456")).expect("should parse");
         let ids = details.identifiers.expect("should have identifiers");
         assert_eq!(
             ids.isbn13.as_deref(),
@@ -390,7 +391,7 @@ mod tests {
     #[test]
     fn test_from_json_error_response() {
         let json = r#"{"error": "not found"}"#;
-        let err = ItemDetails::from_json(json, "bad").unwrap_err();
+        let err = ItemDetails::from_json(json, &Md5::from("bad0")).unwrap_err();
         assert!(err.to_string().contains("not found"));
     }
 
@@ -399,7 +400,7 @@ mod tests {
         let inner = r#"{"file_unified_data":{"title_best":"Double"}}"#;
         let outer = serde_json::to_string(inner).unwrap();
         let details =
-            ItemDetails::from_json(&outer, "dbl").expect("should parse");
+            ItemDetails::from_json(&outer, &Md5::from("ddb1")).expect("should parse");
         assert_eq!(details.title, "Double");
     }
 

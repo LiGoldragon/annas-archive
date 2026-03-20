@@ -19,7 +19,7 @@ async fn live_search() {
     for r in &response.results {
         println!(
             "  [{md5}] {title} — {author} ({fmt}, {size})",
-            md5 = &r.md5[..8],
+            md5 = &r.md5.to_hex()[..8],
             title = r.title,
             author = r.author.as_deref().unwrap_or("?"),
             fmt = r
@@ -36,6 +36,6 @@ async fn live_search() {
 
     // Verify structured types
     let first = &response.results[0];
-    assert!(!first.md5.is_empty());
+    assert_ne!(first.md5.as_bytes(), &[0u8; 16]);
     assert!(!first.title.is_empty());
 }
