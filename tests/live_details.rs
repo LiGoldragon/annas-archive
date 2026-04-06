@@ -1,7 +1,7 @@
 //! Live integration test — search + details with API key.
 //! Run with: cargo test --test live_details -- --ignored --nocapture
 
-use annas_archive::{Client, Md5, SearchOptions};
+use bibliotheca::{Client, Md5, SearchOptions};
 
 #[tokio::test]
 #[ignore] // requires network + API key

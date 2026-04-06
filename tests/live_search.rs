@@ -1,7 +1,7 @@
 //! Live integration test — requires network access.
 //! Run with: cargo test --test live_search -- --ignored
 
-use annas_archive::{Client, SearchOptions};
+use bibliotheca::{Client, SearchOptions};
 
 #[tokio::test]
 #[ignore] // requires network
